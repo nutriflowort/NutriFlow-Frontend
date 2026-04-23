@@ -8,6 +8,7 @@ import {
     StyleSheet,
 } from "react-native";
 import { login } from "../../src/service/auth";
+import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
 
@@ -15,11 +16,15 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    //VARIABLE DE NAVEGACION ENTRE PANTALLAS
+    const router = useRouter();
+
+
     //FUNCION DEL BOTON LOGIN
     const cargarLogin = async () => {
         try {
             //LLAMA A FUNCION AUTH (ADENTRO DE SRC/AUTH)
-            const data = await login({email,password,});
+            const data = await login({ email, password, });
 
             console.log("Login correcto:", data);
         } catch (error: any) {
@@ -70,7 +75,14 @@ export default function LoginScreen() {
                         <Text style={styles.buttonText}>Ingresar</Text>
                     </Pressable>
 
-                    <Text style={styles.helper}>¿Olvidaste tu contraseña?</Text>
+                    <Pressable onPress={() => router.push('/')}>
+                        <Text style={styles.helper}>¿Olvidaste tu contraseña?</Text>
+                    </Pressable>
+
+                    <Pressable onPress={() => router.push('/register')}>
+                        <Text style={styles.registrate}>¿No tenés usuario? Registrate</Text>
+                    </Pressable>
+
                 </View>
             </View>
         </SafeAreaView>
@@ -174,6 +186,12 @@ const styles = StyleSheet.create({
         marginTop: 16,
         textAlign: "center",
         color: "#64748B",
+        fontSize: 13,
+    },
+    registrate: {
+        marginTop: 16,
+        textAlign: "center",
+        color: "#16A34A",
         fontSize: 13,
     },
 });

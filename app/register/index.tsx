@@ -10,6 +10,7 @@ import {
 } from "react-native";
 // import { register } from "../../src/service/auth"; // descomenta cuando tengas la función
 import { Picker } from '@react-native-picker/picker';
+import { useRouter } from 'expo-router';
 
 export default function RegisterScreen() {
 
@@ -19,6 +20,9 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rol, setRol] = useState("Paciente");
+
+    //VARIABLE DE NAVEGACION ENTRE PANTALLAS
+    const router = useRouter();
 
     // FUNCION DEL BOTON REGISTRAR
     const cargarRegistro = async () => {
@@ -111,7 +115,9 @@ export default function RegisterScreen() {
                         <Text style={styles.buttonText}>Crear cuenta</Text>
                     </Pressable>
 
-                    <Text style={styles.helper}>¿Ya tenés una cuenta? Iniciá sesión</Text>
+                    <Pressable onPress={() => router.push('/login')}>
+                        <Text style={styles.login}>¿Ya tenés una cuenta? Iniciá sesión</Text>
+                    </Pressable>
                 </View>
             </View>
         </SafeAreaView>
@@ -239,5 +245,11 @@ const styles = StyleSheet.create({
 
     picker: {
         color: '#0F172A'
-    }
+    },
+    login: {
+        marginTop: 16,
+        textAlign: "center",
+        color: "#16A34A",
+        fontSize: 13,
+    },
 });
