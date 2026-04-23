@@ -9,6 +9,8 @@ import {
     StyleSheet,
 } from "react-native";
 // import { register } from "../../src/service/auth"; // descomenta cuando tengas la función
+import { Picker } from '@react-native-picker/picker';
+import { useRouter } from 'expo-router';
 
 export default function RegisterScreen() {
 
@@ -17,12 +19,16 @@ export default function RegisterScreen() {
     const [apellido, setApellido] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [rol, setRol] = useState("Paciente");
+
+    //VARIABLE DE NAVEGACION ENTRE PANTALLAS
+    const router = useRouter();
 
     // FUNCION DEL BOTON REGISTRAR
     const cargarRegistro = async () => {
         try {
             // LLAMA A FUNCION AUTH (ADENTRO DE SRC/AUTH)
-            const data = await register({ nombre, apellido, email, password });
+            const data = await register({ nombre, apellido, email, password, rol });
             console.log("Registro correcto:", data);
         } catch (error: any) {
             console.log("Error:", error.response?.data);
@@ -91,12 +97,27 @@ export default function RegisterScreen() {
                         onChangeText={setPassword}
                     />
 
+                    <Text style={styles.label}>Tipo de cuenta</Text>
+
+                    <View style={styles.selectContainer}>
+                        <Picker
+                            selectedValue={rol}
+                            onValueChange={(itemValue) => setRol(itemValue)}
+                            style={styles.picker}
+                        >
+                            <Picker.Item label="Paciente" value="Paciente" />
+                            <Picker.Item label="Nutricionista" value="Nutricionista" />
+                        </Picker>
+                    </View>
+
                     {/* BOTON REGISTRAR */}
                     <Pressable style={styles.button} onPress={cargarRegistro}>
                         <Text style={styles.buttonText}>Crear cuenta</Text>
                     </Pressable>
 
-                    <Text style={styles.helper}>¿Ya tenés una cuenta? Iniciá sesión</Text>
+                    <Pressable onPress={() => router.push('/login')}>
+                        <Text style={styles.login}>¿Ya tenés una cuenta? Iniciá sesión</Text>
+                    </Pressable>
                 </View>
             </View>
         </SafeAreaView>
@@ -209,6 +230,26 @@ const styles = StyleSheet.create({
         marginTop: 16,
         textAlign: "center",
         color: "#64748B",
+        fontSize: 13,
+    },
+    selectContainer: {
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 12,
+        backgroundColor: '#F8FAFC',
+        justifyContent: 'center',
+        height: 55,
+        paddingHorizontal: 10,
+        marginBottom: 10
+    },
+
+    picker: {
+        color: '#0F172A'
+    },
+    login: {
+        marginTop: 16,
+        textAlign: "center",
+        color: "#16A34A",
         fontSize: 13,
     },
 });

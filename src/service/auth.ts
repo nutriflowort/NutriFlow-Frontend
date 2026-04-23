@@ -10,6 +10,7 @@ type RegisterRequest = {
   apellido: string;
   email: string;
   password: string;
+  rol: string;
 };
 
 export type UserDto = {
@@ -44,6 +45,7 @@ export const register = async ({
   apellido,
   email,
   password,
+  rol
 }: RegisterRequest): Promise<RegisterResponse> => {
   // USA LA URL "API" QUE ESTA EN ("API.TS" ADENTRO DE SRC/SERVICE) ESTO RECIBE UN REGISTER RESPONSE.
   const response = await api.post<RegisterResponse>("/register", {
@@ -51,6 +53,7 @@ export const register = async ({
     apellido,
     email,
     password,
+    rol
   });
 
   // RESPUESTA
