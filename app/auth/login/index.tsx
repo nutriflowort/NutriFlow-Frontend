@@ -7,7 +7,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import { login } from "../../src/service/auth";
+import { login } from "@/services/auth";
 import { useRouter } from "expo-router";
 import { useSession } from "@/context/SessionContext";
 

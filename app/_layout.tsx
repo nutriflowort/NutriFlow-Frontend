@@ -28,7 +28,7 @@ function RootLayoutNav() {
       // TIENE SESION Y ESTA EN LOGIN/REGISTER → MANDA AL HOME
       router.replace("/home" as any);
     } else if (!user && !enPantallaAuth) {
-      // NO TIENE SESION Y ESTA EN PANTALLA PROTEGIDA → MANDA AL LOGIN
+      // NO TIENE SESION Y NO ESTA EN LOGIN/REGISTER → MANDA AL LOGIN
       router.replace("/login");
     }
   }, [user, loading, segments]);
