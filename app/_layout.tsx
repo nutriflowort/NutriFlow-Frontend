@@ -30,7 +30,7 @@ function RootLayoutNav() {
       // NO TIENE SESION Y NO ESTA EN LOGIN/REGISTER → MANDA AL LOGIN
       router.replace("/auth/login");
     }
-  }, [user, loading, segments]);
+  }, [user, loading, segments, router]);
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }

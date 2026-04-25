@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserDto } from "@/src/features/auth/services/login.service";
-
-const SESSION_KEY = "nutriflow_user";
+import {
+  SESSION_TOKEN_KEY,
+  SESSION_USER_KEY,
+} from "@/src/shared/constants/storage";
 
 type SessionContextType = {
   user: UserDto | null;
+  token: string | null;
   loading: boolean;
-  guardarSesion: (userData: UserDto) => Promise<void>;
+  guardarSesion: (userData: UserDto, tokenData: string) => Promise<void>;
   cerrarSesion: () => Promise<void>;
 };
 
@@ -16,15 +19,21 @@ const SessionContext = createContext<SessionContextType | null>(null);
 // PROVIDER QUE ENVUELVE TODA LA APP
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserDto | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // AL MONTAR, CHEQUEA SI HAY SESION GUARDADA
   useEffect(() => {
     const cargarSesion = async () => {
       try {
-        const data = await AsyncStorage.getItem(SESSION_KEY);
-        if (data) {
-          setUser(JSON.parse(data));
+        const [userData, tokenData] = await Promise.all([
+          AsyncStorage.getItem(SESSION_USER_KEY),
+          AsyncStorage.getItem(SESSION_TOKEN_KEY),
+        ]);
+
+        if (userData && tokenData) {
+          setUser(JSON.parse(userData));
+          setToken(tokenData);
         }
       } catch (error) {
         console.log("Error leyendo sesión:", error);
@@ -36,10 +45,14 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // GUARDA EL USUARIO EN ASYNCSTORAGE
-  const guardarSesion = async (userData: UserDto) => {
+  const guardarSesion = async (userData: UserDto, tokenData: string) => {
     try {
-      await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(userData));
+      await Promise.all([
+        AsyncStorage.setItem(SESSION_USER_KEY, JSON.stringify(userData)),
+        AsyncStorage.setItem(SESSION_TOKEN_KEY, tokenData),
+      ]);
       setUser(userData);
+      setToken(tokenData);
     } catch (error) {
       console.log("Error guardando sesión:", error);
     }
@@ -48,8 +61,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   // BORRA LA SESION (LOGOUT)
   const cerrarSesion = async () => {
     try {
-      await AsyncStorage.removeItem(SESSION_KEY);
+      await Promise.all([
+        AsyncStorage.removeItem(SESSION_USER_KEY),
+        AsyncStorage.removeItem(SESSION_TOKEN_KEY),
+      ]);
       setUser(null);
+      setToken(null);
     } catch (error) {
       console.log("Error cerrando sesión:", error);
     }
@@ -57,7 +74,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionContext.Provider
-      value={{ user, loading, guardarSesion, cerrarSesion }}
+      value={{ user, token, loading, guardarSesion, cerrarSesion }}
     >
       {children}
     </SessionContext.Provider>
