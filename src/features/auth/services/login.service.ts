@@ -9,11 +9,13 @@ export type UserDto = {
   id: string;
   nombre: string;
   email: string;
+  rol: string; 
 };
 
 export type LoginResponse = {
   message: string;
   user: UserDto;
+  token: string;
 };
 
 export const login = async ({
