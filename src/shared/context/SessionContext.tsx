@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserDto } from "../src/service/auth";
+import { UserDto } from "@/src/features/auth/services/login.service";
 
 const SESSION_KEY = "nutriflow_user";
 

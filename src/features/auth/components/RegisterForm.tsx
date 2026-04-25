@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
+import { useRegister } from "../hooks/useRegister";
 import {
   SafeAreaView,
   View,
@@ -7,43 +9,11 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import { login } from "../../src/service/auth";
-import { useRouter } from "expo-router";
-import { useSession } from "@/context/SessionContext";
 
-export default function LoginScreen() {
-  // VARIABLES DE INPUT
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export function RegisterForm() {
+    // VARIABLES DE INPUT
+    const { nombre, setNombre, apellido, setApellido, email, setEmail, password, setPassword, rol, setRol, cargarRegistro } = useRegister();
 
-  // MENSAJE DE ERROR
-  const [error, setError] = useState("");
-
-  // VARIABLE DE NAVEGACION ENTRE PANTALLAS
-  const router = useRouter();
-
-  // HOOK DE SESION
-  const { guardarSesion } = useSession();
-
-  // FUNCION DEL BOTON LOGIN
-  const cargarLogin = async () => {
-    setError(""); // LIMPIA EL ERROR ANTERIOR
-    try {
-      // LLAMA A FUNCION AUTH (ADENTRO DE SRC/AUTH)
-      const data = await login({ email, password });
-
-      // GUARDA LA SESION → EL LAYOUT DETECTA EL CAMBIO Y REDIRIGE AUTOMATICAMENTE
-      await guardarSesion(data.user);
-
-      console.log("Login correcto:", data);
-    } catch (error: any) {
-      console.log("Error:", error.response?.data);
-      // MUESTRA EL MENSAJE DE ERROR DEBAJO DEL BOTON
-      setError("Credenciales inválidas. Verificá tu correo y contraseña.");
-    }
-  };
-
-  // ACA EMPIEZA A CREAR LA PANTALLA
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bgTop} />
@@ -51,12 +21,36 @@ export default function LoginScreen() {
 
       <View style={styles.card}>
         <Text style={styles.brand}>NutriFlow</Text>
-        <Text style={styles.title}>Iniciar sesión</Text>
-        <Text style={styles.subtitle}>
-          Ingresá tu correo y contraseña para continuar
-        </Text>
+        <Text style={styles.title}>Crear cuenta</Text>
+        <Text style={styles.subtitle}>Completá tus datos para comenzar</Text>
 
         <View style={styles.form}>
+          {/* FILA: NOMBRE Y APELLIDO LADO A LADO */}
+          <View style={styles.row}>
+            <View style={styles.halfField}>
+              <Text style={styles.label}>Nombre</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Juan"
+                placeholderTextColor="#94A3B8"
+                autoCapitalize="words"
+                value={nombre}
+                onChangeText={setNombre}
+              />
+            </View>
+            <View style={styles.halfField}>
+              <Text style={styles.label}>Apellido</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Pérez"
+                placeholderTextColor="#94A3B8"
+                autoCapitalize="words"
+                value={apellido}
+                onChangeText={setApellido}
+              />
+            </View>
+          </View>
+
           <Text style={styles.label}>Correo electrónico</Text>
           <TextInput
             style={styles.input}
@@ -78,23 +72,28 @@ export default function LoginScreen() {
             onChangeText={setPassword}
           />
 
-          <Pressable style={styles.button} onPress={cargarLogin}>
-            <Text style={styles.buttonText}>Ingresar</Text>
+          <Text style={styles.label}>Tipo de cuenta</Text>
+
+          <View style={styles.selectContainer}>
+            <Picker
+              selectedValue={rol}
+              onValueChange={(itemValue) => setRol(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Paciente" value="Paciente" />
+              <Picker.Item label="Nutricionista" value="Nutricionista" />
+            </Picker>
+          </View>
+
+          {/* BOTON REGISTRAR */}
+          <Pressable style={styles.button} onPress={cargarRegistro}>
+            <Text style={styles.buttonText}>Crear cuenta</Text>
           </Pressable>
 
-          {/* CARTEL DE ERROR - SOLO SE MUESTRA SI HAY UN ERROR */}
-          {error ? (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
-
-          <Pressable onPress={() => router.push("/")}>
-            <Text style={styles.helper}>¿Olvidaste tu contraseña?</Text>
-          </Pressable>
-
-          <Pressable onPress={() => router.push("/register")}>
-            <Text style={styles.registrate}>¿No tenés usuario? Registrate</Text>
+          <Pressable onPress={() => router.push("/auth/login")}>
+            <Text style={styles.login}>
+              ¿Ya tenés una cuenta? Iniciá sesión
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -102,6 +101,7 @@ export default function LoginScreen() {
   );
 }
 
+// ESTILOS DE LA PANTALLA (misma paleta que LoginScreen)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -164,6 +164,15 @@ const styles = StyleSheet.create({
   form: {
     gap: 10,
   },
+  // FILA PARA NOMBRE Y APELLIDO
+  row: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 0,
+  },
+  halfField: {
+    flex: 1,
+  },
   label: {
     fontSize: 14,
     fontWeight: "600",
@@ -194,23 +203,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
   },
-  errorBox: {
-    backgroundColor: "#FEE2E2",
-    borderRadius: 10,
-    padding: 12,
-  },
-  errorText: {
-    color: "#DC2626",
-    fontSize: 13,
-    textAlign: "center",
-  },
   helper: {
     marginTop: 16,
     textAlign: "center",
     color: "#64748B",
     fontSize: 13,
   },
-  registrate: {
+  selectContainer: {
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 12,
+    backgroundColor: "#F8FAFC",
+    justifyContent: "center",
+    height: 55,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+
+  picker: {
+    color: "#0F172A",
+  },
+  login: {
     marginTop: 16,
     textAlign: "center",
     color: "#16A34A",

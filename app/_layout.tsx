@@ -8,8 +8,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { SessionProvider, useSession } from "@/context/SessionContext";
+import { useColorScheme } from "@/src/shared/hooks/use-color-scheme";
+import { SessionProvider, useSession } from "@/src/shared/context/SessionContext";
 
 // COMPONENTE SEPARADO PARA PODER USAR EL HOOK useSession DENTRO DEL PROVIDER
 function RootLayoutNav() {
@@ -21,15 +21,14 @@ function RootLayoutNav() {
     // ESPERA A QUE ASYNCSTORAGE TERMINE DE LEER
     if (loading) return;
 
-    const enPantallaAuth =
-      segments[0] === "login" || segments[0] === "register";
+    const enPantallaAuth = segments[0] === "auth";
 
     if (user && enPantallaAuth) {
       // TIENE SESION Y ESTA EN LOGIN/REGISTER → MANDA AL HOME
-      router.replace("/home" as any);
+      router.replace("/main" as any);
     } else if (!user && !enPantallaAuth) {
-      // NO TIENE SESION Y ESTA EN PANTALLA PROTEGIDA → MANDA AL LOGIN
-      router.replace("/login");
+      // NO TIENE SESION Y NO ESTA EN LOGIN/REGISTER → MANDA AL LOGIN
+      router.replace("/auth/login");
     }
   }, [user, loading, segments]);
 
