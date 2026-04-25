@@ -13,7 +13,7 @@ export function useLogin() {
   const cargarLogin = async () => {
     setError("");
     try {
-      const data = await login({ email, password });
+      const data = await login({ email, password }); // Llama al servicio de login con las credenciales ingresadas
       await guardarSesion(data.user);
     } catch (error: any) {
       setError("Credenciales inválidas. Verificá tu correo y contraseña.");

@@ -12,7 +12,7 @@ import { useLogin } from "../hooks/useLogin";
 
 export function LoginForm() {
   const { email, setEmail, password, setPassword, error, cargarLogin } =
-    useLogin();
+    useLogin(); // uso del hook personalizado para manejar el estado y la lógica del login
   // ACA EMPIEZA A CREAR LA PANTALLA
   return (
     <SafeAreaView style={styles.container}>
