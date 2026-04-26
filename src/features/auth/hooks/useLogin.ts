@@ -15,28 +15,6 @@ export function useLogin() {
     if (!emailLimpio || !passwordLimpia) {
       return "Completá el correo y la contraseña.";
     }
-    
-
-    if (
-      !emailLimpio.includes("@") ||
-      !emailLimpio.includes(".com") ||
-      (!emailLimpio.includes("gmail") && !emailLimpio.includes("hotmail"))
-    ) {
-      return "Ingresá un correo válido de Gmail o Hotmail.";
-    }
-
-    if (passwordLimpia.length < 8) {
-      return "La contraseña debe tener al menos 8 caracteres.";
-    }
-
-    if (!/[A-Z]/.test(passwordLimpia)) {
-      return "La contraseña debe tener al menos una mayúscula.";
-    }
-
-    if (!/[0-9._]/.test(passwordLimpia)) {
-      return "La contraseña debe tener al menos un número, punto o guion bajo.";
-    }
-
     return "";
   };
 

@@ -12,7 +12,7 @@ import {
 
 export function RegisterForm() {
     // VARIABLES DE INPUT
-    const { nombre, setNombre, apellido, setApellido, email, setEmail, password, setPassword, rol, setRol, cargarRegistro } = useRegister();
+    const { nombre, setNombre, apellido, setApellido, email, setEmail, password, setPassword, rol, setRol, error, cargarRegistro } = useRegister();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,6 +89,13 @@ export function RegisterForm() {
           <Pressable style={styles.button} onPress={cargarRegistro}>
             <Text style={styles.buttonText}>Crear cuenta</Text>
           </Pressable>
+
+          {/* CARTEL DE ERROR - SOLO SE MUESTRA SI HAY UN ERROR */}
+          {error ? (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
           <Pressable onPress={() => router.push("/auth/login")}>
             <Text style={styles.login}>
@@ -202,6 +209,16 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
+  },
+  errorBox: {
+    backgroundColor: "#FEE2E2",
+    borderRadius: 10,
+    padding: 12,
+  },
+  errorText: {
+    color: "#DC2626",
+    fontSize: 13,
+    textAlign: "center",
   },
   helper: {
     marginTop: 16,
