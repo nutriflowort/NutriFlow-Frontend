@@ -9,7 +9,10 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/src/shared/hooks/use-color-scheme";
-import { SessionProvider, useSession } from "@/src/shared/context/SessionContext";
+import {
+  SessionProvider,
+  useSession,
+} from "@/src/shared/context/SessionContext";
 
 // COMPONENTE SEPARADO PARA PODER USAR EL HOOK useSession DENTRO DEL PROVIDER
 function RootLayoutNav() {
@@ -18,22 +21,51 @@ function RootLayoutNav() {
   const segments = useSegments();
 
   useEffect(() => {
-    // ESPERA A QUE ASYNCSTORAGE TERMINE DE LEER
     if (loading) return;
 
-    const enPantallaAuth = segments[0] === "auth";
+    const segmentsArray = segments as string[];
+    const enPantallaAuth = segmentsArray[0] === "auth";
+    const intentandoEntrarANutri = segmentsArray.includes("(nutritionist)");
+    const intentandoEntrarAPaciente = segmentsArray.includes("(patient)");
+    const enWelcome = segmentsArray.includes("(welcome)");
 
-    if (user && enPantallaAuth) {
-      // TIENE SESION Y ESTA EN LOGIN/REGISTER → MANDA AL HOME
-      router.replace("/main" as any);
-    } else if (!user && !enPantallaAuth) {
-      // NO TIENE SESION Y NO ESTA EN LOGIN/REGISTER → MANDA AL LOGIN
-      router.replace("/auth/login");
+    // CASO 1: NO HAY SESIÓN
+    if (!user) {
+      if (!enWelcome && !enPantallaAuth) {
+        router.replace("/(welcome)"); // Si no está en welcome ni auth, lo mandamos a welcome
+      }
+      return;
     }
-  }, [user, loading, segments, router]);
 
+    // CASO 2: HAY SESIÓN PERO ESTÁ EN LOGIN O BIENVENIDA
+    if (enWelcome || enPantallaAuth) {
+      const homePath =
+        user.rol === "nutricionista" ? "/(nutritionist)" : "/(patient)";
+      router.replace(homePath as any);
+      return;
+    }
+
+    // CASO 3: PROTECCIÓN DE RUTAS (SEGURIDAD)
+    if (user.rol === "paciente" && intentandoEntrarANutri) {
+      // Si es paciente y quiere entrar a rutas de nutri, lo rebotamos a su index
+      router.replace("/(patient)");
+    } else if (user.rol === "nutricionista" && intentandoEntrarAPaciente) {
+      // Si es nutri y quiere entrar a rutas de paciente, lo rebotamos
+      router.replace("/(nutritionist)");
+    }
+    
+  }, [user, loading, segments]);
+  console.log("Estado actual - User:", !!user, "Ruta:", segments);
   return <Stack screenOptions={{ headerShown: false }} />;
 }
+
+  // return (
+  //   <Stack screenOptions={{ headerShown: false }}>
+  //     {/* Puedes definir las rutas aquí para mayor control */}
+  //     <Stack.Screen name="index" />
+  //     <Stack.Screen name="auth" options={{ navigationBarHidden: true }} />
+  //   </Stack>
+  // );
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

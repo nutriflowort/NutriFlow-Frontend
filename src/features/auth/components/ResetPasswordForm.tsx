@@ -1,19 +1,39 @@
 import React from "react";
 import {
+  Pressable,
   SafeAreaView,
-  View,
+  StyleSheet,
   Text,
   TextInput,
-  Pressable,
-  StyleSheet,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import { useLogin } from "../hooks/useLogin";
+import { router, useLocalSearchParams } from "expo-router";
+import { useResetPassword } from "../hooks/useResetPassword";
 
-export function LoginForm() {
-  const { email, setEmail, password, setPassword, error, cargarLogin } =
-    useLogin(); // uso del hook personalizado para manejar el estado y la lógica del login
-  // ACA EMPIEZA A CREAR LA PANTALLA
+export function ResetPasswordForm() {
+  const params = useLocalSearchParams<{ email?: string }>();
+  const initialEmail = typeof params.email === "string" ? params.email : "";
+  const {
+    email,
+    setEmail,
+    code,
+    setCode,
+    newPassword,
+    setNewPassword,
+    error,
+    message,
+    loading,
+    cambiarPassword,
+  } = useResetPassword(initialEmail);
+
+  const handleCambiarPassword = async () => {
+    const actualizado = await cambiarPassword();
+
+    if (actualizado) {
+      router.replace("/auth/login");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bgTop} />
@@ -21,9 +41,9 @@ export function LoginForm() {
 
       <View style={styles.card}>
         <Text style={styles.brand}>NutriFlow</Text>
-        <Text style={styles.title}>Iniciar sesión</Text>
+        <Text style={styles.title}>Nueva contraseña</Text>
         <Text style={styles.subtitle}>
-          Ingresá tu correo y contraseña para continuar
+          Ingresá el código recibido y elegí una contraseña nueva
         </Text>
 
         <View style={styles.form}>
@@ -38,33 +58,50 @@ export function LoginForm() {
             onChangeText={setEmail}
           />
 
-          <Text style={styles.label}>Contraseña</Text>
+          <Text style={styles.label}>Código</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="123456"
+            placeholderTextColor="#94A3B8"
+            keyboardType="number-pad"
+            value={code}
+            onChangeText={setCode}
+          />
+
+          <Text style={styles.label}>Nueva contraseña</Text>
           <TextInput
             style={styles.input}
             placeholder="********"
             placeholderTextColor="#94A3B8"
             secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            value={newPassword}
+            onChangeText={setNewPassword}
           />
 
-          <Pressable style={styles.button} onPress={cargarLogin}>
-            <Text style={styles.buttonText}>Ingresar</Text>
+          <Pressable
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleCambiarPassword}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Guardando..." : "Cambiar contraseña"}
+            </Text>
           </Pressable>
 
-          {/* CARTEL DE ERROR - SOLO SE MUESTRA SI HAY UN ERROR */}
           {error ? (
             <View style={styles.errorBox}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
-          <Pressable onPress={() => router.push("/auth/forgot-password" as any)}>
-            <Text style={styles.helper}>¿Olvidaste tu contraseña?</Text>
-          </Pressable>
+          {message ? (
+            <View style={styles.successBox}>
+              <Text style={styles.successText}>{message}</Text>
+            </View>
+          ) : null}
 
-          <Pressable onPress={() => router.push("/auth/register")}>
-            <Text style={styles.registrate}>¿No tenés usuario? Registrate</Text>
+          <Pressable onPress={() => router.push("/auth/forgot-password" as any)}>
+            <Text style={styles.helper}>Solicitar otro código</Text>
           </Pressable>
         </View>
       </View>
@@ -159,6 +196,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
@@ -174,16 +214,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: "center",
   },
+  successBox: {
+    backgroundColor: "#DCFCE7",
+    borderRadius: 10,
+    padding: 12,
+  },
+  successText: {
+    color: "#166534",
+    fontSize: 13,
+    textAlign: "center",
+  },
   helper: {
     marginTop: 16,
     textAlign: "center",
     color: "#64748B",
-    fontSize: 13,
-  },
-  registrate: {
-    marginTop: 16,
-    textAlign: "center",
-    color: "#16A34A",
     fontSize: 13,
   },
 });
