@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView, View, Text, Pressable, StyleSheet } from "react-native";
 import { useSession } from "@/src/shared/context/SessionContext";
 
-export default function HomeScreen() {
+export function HomeScreen() {
   const { user, cerrarSesion } = useSession();
 
   return (

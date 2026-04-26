@@ -17,22 +17,44 @@ function RootLayoutNav() {
   const router = useRouter();
   const segments = useSegments();
 
-  useEffect(() => {
-    // ESPERA A QUE ASYNCSTORAGE TERMINE DE LEER
-    if (loading) return;
+useEffect(() => {
+  if (loading) return;
 
-    const enPantallaAuth = segments[0] === "auth";
+  const segmentsArray = segments as string[];
 
-    if (user && enPantallaAuth) {
-      // TIENE SESION Y ESTA EN LOGIN/REGISTER → MANDA AL HOME
-      router.replace("/main" as any);
-    } else if (!user && !enPantallaAuth) {
-      // NO TIENE SESION Y NO ESTA EN LOGIN/REGISTER → MANDA AL LOGIN
-      router.replace("/auth/login");
+  // Basado en tus logs:
+  const isAtWelcome = segmentsArray.length === 0;
+  const isAtAuth = segmentsArray.includes("auth");
+  const isInsideApp = !isAtWelcome && !isAtAuth;
+
+  if (!user) {
+    // Si no hay usuario y estamos "dentro" (ej. en (patient)), redirigir a bienvenida
+    if (isInsideApp) {
+      router.replace("/");
     }
-  }, [user, loading, segments, router]);
-
+  } else {
+    // Si hay usuario y estamos fuera, mandarlo a su lugar
+    if (isAtWelcome || isAtAuth) {
+      const homePath =
+        user.rol === "nutricionista" ? "/(nutritionist)" : "/(patient)";
+      // Usamos replace para limpiar el historial
+      router.replace(homePath as any);
+    }
+  }
+  console.log("Segmentos actuales:", segments)
+}, [user, loading, segments]);
+  
+ if (loading) return null; // O un splash screen
+  
   return <Stack screenOptions={{ headerShown: false }} />;
+  
+  // return (
+  //   <Stack screenOptions={{ headerShown: false }}>
+  //     {/* Puedes definir las rutas aquí para mayor control */}
+  //     <Stack.Screen name="index" />
+  //     <Stack.Screen name="auth" options={{ navigationBarHidden: true }} />
+  //   </Stack>
+  // );
 }
 
 export default function RootLayout() {
