@@ -1,19 +1,30 @@
 import React from "react";
 import {
+  Pressable,
   SafeAreaView,
-  View,
+  StyleSheet,
   Text,
   TextInput,
-  Pressable,
-  StyleSheet,
+  View,
 } from "react-native";
 import { router } from "expo-router";
-import { useLogin } from "../hooks/useLogin";
+import { useForgotPassword } from "../hooks/useForgotPassword";
 
-export function LoginForm() {
-  const { email, setEmail, password, setPassword, error, cargarLogin } =
-    useLogin(); // uso del hook personalizado para manejar el estado y la lógica del login
-  // ACA EMPIEZA A CREAR LA PANTALLA
+export function ForgotPasswordForm() {
+  const { email, setEmail, error, loading, enviarCodigo } =
+    useForgotPassword();
+
+  const handleEnviarCodigo = async () => {
+    const enviado = await enviarCodigo();
+
+    if (enviado) {
+      router.push({
+        pathname: "/auth/reset-password" as any,
+        params: { email: email.trim().toLowerCase() },
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bgTop} />
@@ -21,9 +32,9 @@ export function LoginForm() {
 
       <View style={styles.card}>
         <Text style={styles.brand}>NutriFlow</Text>
-        <Text style={styles.title}>Iniciar sesión</Text>
+        <Text style={styles.title}>Recuperar contraseña</Text>
         <Text style={styles.subtitle}>
-          Ingresá tu correo y contraseña para continuar
+          Ingresá tu correo para recibir el código de recuperación
         </Text>
 
         <View style={styles.form}>
@@ -38,33 +49,24 @@ export function LoginForm() {
             onChangeText={setEmail}
           />
 
-          <Text style={styles.label}>Contraseña</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="********"
-            placeholderTextColor="#94A3B8"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <Pressable style={styles.button} onPress={cargarLogin}>
-            <Text style={styles.buttonText}>Ingresar</Text>
+          <Pressable
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleEnviarCodigo}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Enviando..." : "Enviar código"}
+            </Text>
           </Pressable>
 
-          {/* CARTEL DE ERROR - SOLO SE MUESTRA SI HAY UN ERROR */}
           {error ? (
             <View style={styles.errorBox}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
-          <Pressable onPress={() => router.push("/auth/forgot-password" as any)}>
-            <Text style={styles.helper}>¿Olvidaste tu contraseña?</Text>
-          </Pressable>
-
-          <Pressable onPress={() => router.push("/auth/register")}>
-            <Text style={styles.registrate}>¿No tenés usuario? Registrate</Text>
+          <Pressable onPress={() => router.push("/auth/login")}>
+            <Text style={styles.helper}>Volver al inicio de sesión</Text>
           </Pressable>
         </View>
       </View>
@@ -159,6 +161,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
@@ -178,12 +183,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     textAlign: "center",
     color: "#64748B",
-    fontSize: 13,
-  },
-  registrate: {
-    marginTop: 16,
-    textAlign: "center",
-    color: "#16A34A",
     fontSize: 13,
   },
 });
