@@ -26,6 +26,15 @@ export function useForgotPassword() {
     try {
       setLoading(true);
       const data = await forgotPassword({ email: emailLimpio });
+
+      if (data.code) {
+        console.log("[DEV] Código recibido:", data.code);
+      }
+
+      if (data.resetLink) {
+        console.log("[DEV] Reset link:", data.resetLink);
+      }
+
       setMessage(
         data.message || "Si el correo existe, recibirás instrucciones.",
       );
