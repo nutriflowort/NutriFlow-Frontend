@@ -9,10 +9,26 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
+import { PopUp } from "@/src/shared/components/ui/popUp";
 
 export function RegisterForm() {
-    // VARIABLES DE INPUT
-    const { nombre, setNombre, apellido, setApellido, email, setEmail, password, setPassword, rol, setRol, error, cargarRegistro } = useRegister();
+  // VARIABLES DE INPUT
+  const {
+    nombre,
+    setNombre,
+    apellido,
+    setApellido,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    rol,
+    setRol,
+    error,
+    showSuccessPopUp,
+    handleClosePopUp,
+    cargarRegistro,
+  } = useRegister();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -104,6 +120,15 @@ export function RegisterForm() {
           </Pressable>
         </View>
       </View>
+
+      {/* COMPONENTE POP-UP */}
+      <PopUp
+        visible={showSuccessPopUp}
+        title="¡Usuario creado!"
+        message="Tu cuenta ha sido registrada con éxito. Ahora podés iniciar sesión."
+        type="success"
+        onClose={handleClosePopUp}
+      />
     </SafeAreaView>
   );
 }

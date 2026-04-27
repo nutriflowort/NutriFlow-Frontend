@@ -10,6 +10,9 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { useResetPassword } from "../hooks/useResetPassword";
 
+import { PopUp } from "@/src/shared/components/ui/popUp";
+
+
 export function ResetPasswordForm() {
   const params = useLocalSearchParams<{ email?: string }>();
   const initialEmail = typeof params.email === "string" ? params.email : "";
@@ -23,15 +26,13 @@ export function ResetPasswordForm() {
     error,
     message,
     loading,
+    showSuccessPopUp,
+    handleClosePopUp,
     cambiarPassword,
   } = useResetPassword(initialEmail);
 
   const handleCambiarPassword = async () => {
-    const actualizado = await cambiarPassword();
-
-    if (actualizado) {
-      router.replace("/auth/login");
-    }
+    await cambiarPassword();
   };
 
   return (
@@ -100,11 +101,21 @@ export function ResetPasswordForm() {
             </View>
           ) : null}
 
-          <Pressable onPress={() => router.push("/auth/forgot-password" as any)}>
+          <Pressable
+            onPress={() => router.push("/auth/forgot-password" as any)}
+          >
             <Text style={styles.helper}>Solicitar otro código</Text>
           </Pressable>
         </View>
       </View>
+      {/* COMPONENTE POP-UP */}
+      <PopUp
+        visible={showSuccessPopUp}
+        title="¡Contraseña actualizada!"
+        message="Tu contraseña ha sido actualizada con éxito. Ahora podés iniciar sesión."
+        type="success"
+        onClose={handleClosePopUp}
+      />
     </SafeAreaView>
   );
 }

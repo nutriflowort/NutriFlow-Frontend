@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { resetPassword } from "@/src/features/auth/services";
+import { router } from "expo-router"; 
+
 
 export function useResetPassword(initialEmail = "") {
   const [email, setEmail] = useState(initialEmail);
@@ -8,6 +10,7 @@ export function useResetPassword(initialEmail = "") {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSuccessPopUp, setShowSuccessPopUp] = useState(false);
 
   const cambiarPassword = async () => {
     setError("");
@@ -39,6 +42,8 @@ export function useResetPassword(initialEmail = "") {
         newPassword,
       });
 
+      setShowSuccessPopUp(true);
+
       setMessage(data.message || "Contraseña actualizada correctamente.");
       return true;
     } catch {
@@ -47,6 +52,12 @@ export function useResetPassword(initialEmail = "") {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función para manejar el cierre del Pop-up y la navegación
+  const handleClosePopUp = () => {
+    setShowSuccessPopUp(false);
+    router.replace("/auth/login");
   };
 
   return {
@@ -59,6 +70,8 @@ export function useResetPassword(initialEmail = "") {
     error,
     message,
     loading,
+    showSuccessPopUp,
+    handleClosePopUp,
     cambiarPassword,
   };
 }
