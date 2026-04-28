@@ -30,8 +30,9 @@ export function useLogin() {
     try {
       const data = await login({ email, password }); // Llama al servicio de login con las credenciales ingresadas
       await guardarSesion(data.user, data.token);
-    } catch {
-      setError("Credenciales inválidas. Verificá tu correo y contraseña.");
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Error desconocido. Intentá nuevamente.",
+      );
     }
   };
 

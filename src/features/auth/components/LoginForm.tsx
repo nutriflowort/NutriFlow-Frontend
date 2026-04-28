@@ -45,7 +45,7 @@ export function LoginForm() {
             placeholderTextColor="#94A3B8"
             secureTextEntry
             value={password}
-            onChangeText={setPassword}
+            onChangeText={setPassword} // TODO PARA BOTON DE VER CONTRASEÑA
           />
 
           <Pressable style={styles.button} onPress={cargarLogin}>

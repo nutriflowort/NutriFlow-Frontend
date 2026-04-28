@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { register } from "../services";
-import { router } from "expo-router"; 
+import { router } from "expo-router";
 
 export function useRegister() {
   const [nombre, setNombre] = useState("");
@@ -25,7 +25,7 @@ export function useRegister() {
     if (
       !emailLimpio.includes("@") ||
       !emailLimpio.includes(".com") ||
-      (!emailLimpio.includes("gmail") && !emailLimpio.includes("hotmail"))
+      (!emailLimpio.includes("gmail") && !emailLimpio.includes("hotmail")) // Validación específica para Gmail o Hotmail, PENDIENTE DE REVISAR SI SE DEBE QUITAR ESTA RESTRICCIÓN
     ) {
       return "Ingresá un correo válido de Gmail o Hotmail.";
     }
@@ -63,7 +63,8 @@ export function useRegister() {
       setShowSuccessPopUp(true);
     } catch (error: any) {
       console.log("Error:", error.response?.data);
-      setError("No se pudo crear la cuenta. Verificá los datos ingresados.");
+      // setError("No se pudo crear la cuenta. Verificá los datos ingresados.");
+      setError(error.response?.data?.message || "Error desconocido. Intentá nuevamente.");
     }
   };
 
